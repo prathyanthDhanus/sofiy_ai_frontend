@@ -1,6 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useLogin } from "./useLogin";
 import { ArrowLeft, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { cn } from "cn";
@@ -138,20 +144,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
               ⚡ Test Bypass Credentials (Click to fill):
             </div>
             <div className="flex flex-wrap gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => fillTestCredentials("mobile")}
-                className="text-xs bg-white dark:bg-zinc-800 border border-amber-200 dark:border-amber-800/60 hover:border-amber-400 px-2.5 py-1 rounded-md text-amber-900 dark:text-amber-200 font-mono transition-colors"
+                className="h-7 text-xs bg-white dark:bg-zinc-800 border-amber-200 dark:border-amber-800/60 hover:border-amber-400 px-2.5 rounded-md text-amber-900 dark:text-amber-200 font-mono transition-colors cursor-pointer"
               >
                 📱 {testBypass.mobile}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => fillTestCredentials("email")}
-                className="text-xs bg-white dark:bg-zinc-800 border border-amber-200 dark:border-amber-800/60 hover:border-amber-400 px-2.5 py-1 rounded-md text-amber-900 dark:text-amber-200 font-mono transition-colors"
+                className="h-7 text-xs bg-white dark:bg-zinc-800 border-amber-200 dark:border-amber-800/60 hover:border-amber-400 px-2.5 rounded-md text-amber-900 dark:text-amber-200 font-mono transition-colors cursor-pointer"
               >
                 ✉️ {testBypass.email}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -176,7 +186,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#07090e] px-3 text-muted-foreground font-medium">
+              <span className="bg-[#07090e] px-3 text-muted-foreground font-medium rounded-md">
                 or continue with
               </span>
             </div>
@@ -228,13 +238,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
               Code sent to:{" "}
               <strong className="text-foreground">{identifier}</strong>
             </span>
-            <button
+            <Button
               type="button"
+              variant="link"
+              size="sm"
               onClick={handleEditIdentifier}
-              className="text-[#E8B931] hover:underline font-semibold flex items-center gap-1 shrink-0 ml-2 cursor-pointer"
+              className="h-auto p-0 text-xs text-[#E8B931] hover:underline font-semibold flex items-center gap-1 shrink-0 ml-2 cursor-pointer"
             >
               <ArrowLeft className="w-3 h-3" /> Change
-            </button>
+            </Button>
           </div>
 
           {/* Morphing OTP Container: 6 boxes when typing -> collapses into 1 centered square on success/failure */}
@@ -289,24 +301,35 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
             {/* STATE 3: Failure Collapsed Centered Red Square with Shake Animation & X (Exact Match to Video) */}
             {otpStatus === "failure" && (
-              <div
-                onClick={resetOtpToIdle}
-                title="Click to retry"
-                className="w-16 h-16 rounded-2xl bg-rose-500 text-white flex items-center justify-center shadow-[0_0_35px_rgba(244,63,94,0.6),0_0_12px_rgba(244,63,94,0.4)] animate-otp-shake cursor-pointer group transition-all"
-              >
-                <svg
-                  className="w-8 h-8 text-white drop-shadow-md animate-badge-pop"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </div>
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      onClick={resetOtpToIdle}
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Click to retry"
+                      className="w-16 h-16 rounded-2xl bg-rose-500 text-white flex items-center justify-center shadow-[0_0_35px_rgba(244,63,94,0.6),0_0_12px_rgba(244,63,94,0.4)] animate-otp-shake cursor-pointer group transition-all"
+                    >
+                      <svg
+                        className="w-8 h-8 text-white drop-shadow-md animate-badge-pop"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="text-xs">
+                    Click to retry
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
 
@@ -317,24 +340,28 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
                 Redirecting to your dashboard...
               </p>
             ) : otpStatus === "failure" ? (
-              <button
+              <Button
                 type="button"
+                variant="link"
+                size="sm"
                 onClick={resetOtpToIdle}
-                className="text-rose-400 hover:underline font-semibold cursor-pointer"
+                className="h-auto p-0 text-xs text-rose-400 hover:underline font-semibold cursor-pointer"
               >
                 Click the red icon or here to retry
-              </button>
+              </Button>
             ) : !canResend ? (
               <span>Didn't receive the code? Resend in {countdown}s</span>
             ) : (
-              <button
+              <Button
                 type="button"
+                variant="link"
+                size="sm"
                 onClick={handleResendOtp}
                 disabled={loading || otpStatus !== "idle"}
-                className="text-[#E8B931] hover:underline font-semibold cursor-pointer"
+                className="h-auto p-0 text-xs text-[#E8B931] hover:underline font-semibold cursor-pointer"
               >
                 Didn't receive the code? <span className="underline font-bold">Resend</span>
-              </button>
+              </Button>
             )}
           </div>
 

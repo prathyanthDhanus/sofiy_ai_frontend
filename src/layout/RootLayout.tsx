@@ -17,7 +17,7 @@ export const RootLayout: React.FC<RootLayoutProps> = ({ children, onNavigateToAu
   return (
     <TooltipProvider delayDuration={0}>
       <SidebarProvider defaultOpen={true}>
-        <div className="dark min-h-screen flex w-full bg-background text-foreground">
+        <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
           {/* Shadcn Admin Sidebar Component */}
           <AdminSidebar
             activeItem={activeItem}

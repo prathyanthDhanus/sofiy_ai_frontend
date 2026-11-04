@@ -26,6 +26,13 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export interface AdminSidebarProps {
   activeItem?: string
@@ -146,9 +153,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <div className="flex items-center justify-between w-full p-2 rounded-xl bg-muted/40 border border-border group-data-[collapsible=icon]:p-1.5">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="relative shrink-0">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#E8B931] to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
-                    AD
-                  </div>
+                  <Avatar className="w-8 h-8 rounded-full border border-border">
+                    <AvatarFallback className="bg-gradient-to-tr from-[#E8B931] to-amber-600 text-white font-bold text-xs">
+                      AD
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-card" />
                 </div>
                 <div className="min-w-0 group-data-[collapsible=icon]:hidden">
@@ -158,14 +167,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               </div>
 
               {onNavigateToAuth && (
-                <button
-                  type="button"
-                  onClick={onNavigateToAuth}
-                  title="Sign out & return to login"
-                  className="p-1.5 text-muted-foreground hover:text-rose-400 hover:bg-muted rounded-lg transition-colors group-data-[collapsible=icon]:hidden cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={onNavigateToAuth}
+                      className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-muted rounded-lg transition-colors group-data-[collapsible=icon]:hidden cursor-pointer"
+                      aria-label="Sign out & return to login"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    Sign out & return to login
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
           </SidebarMenuItem>

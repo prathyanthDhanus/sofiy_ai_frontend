@@ -4,6 +4,12 @@ import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Bell, Search, ExternalLink } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export interface AdminNavbarProps {
   title?: string
@@ -42,23 +48,35 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
         </div>
       </div>
 
-      {/* Right: AI Status, Notifications & View Switcher */}
+      {/* Right: AI Status, Theme Toggle, Notifications & View Switcher */}
       <div className="flex items-center gap-3 shrink-0">
         {/* Live AI Status Badge */}
-        <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <span>AI Core Active</span>
         </div>
 
+        {/* Day / Night Animated Theme Switch */}
+        <ThemeToggle size="sm" />
+
         {/* Notifications Button */}
-        <button
-          type="button"
-          className="relative p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-          title="Notifications"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E8B931]" />
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              aria-label="View notifications"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#E8B931]" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            Notifications
+          </TooltipContent>
+        </Tooltip>
 
         {/* Switch to Login View for testing */}
         {onNavigateToAuth && (

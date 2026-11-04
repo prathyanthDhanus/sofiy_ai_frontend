@@ -3,6 +3,7 @@ import loginImg from '@/assets/login.jpg'
 import { AuthVectorBackground } from '@/app/pages/auth/components/AuthVectorBackground'
 import { GraduationCap, ShieldCheck, Sparkles } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export interface AuthLayoutProps {
   children?: React.ReactNode
@@ -45,11 +46,14 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* Top-Right Status Badge */}
-        <Badge variant="outline" className="h-7 px-3 gap-1.5 border-white/15 bg-black/40 text-zinc-200 backdrop-blur-md shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-[#E8B931] animate-pulse shadow-[0_0_8px_#E8B931]" />
-          AI Learning Platform
-        </Badge>
+        {/* Top-Right Status Badge & Theme Toggle */}
+        <div className="flex items-center gap-3">
+          <ThemeToggle size="sm" />
+          <Badge variant="outline" className="h-7 px-3 gap-1.5 border-white/15 bg-black/40 text-zinc-200 backdrop-blur-md shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-[#E8B931] animate-pulse shadow-[0_0_8px_#E8B931]" />
+            AI Learning Platform
+          </Badge>
+        </div>
       </header>
 
       {/* Main Content Area: Centered Login Form with Transparent Glassmorphic Card */}
