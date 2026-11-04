@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLogin } from "./useLogin";
 import { ArrowLeft, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
+import { cn } from "cn";
 
 export const LoginForm: React.FC = () => {
   const {
@@ -10,6 +11,7 @@ export const LoginForm: React.FC = () => {
     identifier,
     setIdentifier,
     otp,
+    otpStatus,
     loading,
     errorMessage,
     successMessage,
@@ -24,6 +26,7 @@ export const LoginForm: React.FC = () => {
     handleEditIdentifier,
     fillTestCredentials,
     handleGoogleLogin,
+    resetOtpToIdle,
     testBypass,
   } = useLogin();
 
@@ -33,22 +36,46 @@ export const LoginForm: React.FC = () => {
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
-      {/* Header */}
+      {/* Header - Dynamically updates just like the video demo */}
       <div className="space-y-2">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground transition-all">
           {step === "IDENTIFIER" && "Welcome to Sofiy AI Tutor"}
-          {step === "OTP" && "Verify your identity"}
+          {step === "OTP" && otpStatus === "success" && (
+            <span className="text-white animate-badge-pop inline-block">
+              Verified successfully
+            </span>
+          )}
+          {step === "OTP" && otpStatus === "failure" && (
+            <span className="text-rose-400 animate-otp-shake inline-block">
+              Verification failed
+            </span>
+          )}
+          {step === "OTP" && (otpStatus === "idle" || otpStatus === "verifying") && (
+            "Let's verify your code"
+          )}
           {step === "SUCCESS" && "Welcome back!"}
         </h2>
-        <p className="text-sm text-muted-foreground">
+
+        <p className="text-sm text-muted-foreground transition-all">
           {step === "IDENTIFIER" &&
             "Enter your mobile number or email to receive a secure login code."}
-          {step === "OTP" && (
+          {step === "OTP" && otpStatus === "success" && (
+            <span className="text-zinc-300">
+              Your credentials have been verified.
+            </span>
+          )}
+          {step === "OTP" && otpStatus === "failure" && (
+            <span className="text-zinc-300">
+              Incorrect code. Click the red icon or below to retry.
+            </span>
+          )}
+          {step === "OTP" && (otpStatus === "idle" || otpStatus === "verifying") && (
             <span>
-              Enter the 6-digit code sent to{" "}
+              We've sent a 6-digit code to{" "}
               <strong className="text-foreground font-medium">
                 {identifier}
               </strong>
+              . It'll auto-verify once entered.
             </span>
           )}
           {step === "SUCCESS" && "You have successfully signed in."}
@@ -56,14 +83,14 @@ export const LoginForm: React.FC = () => {
       </div>
 
       {/* Status Alerts */}
-      {errorMessage && (
+      {errorMessage && otpStatus === "idle" && (
         <div className="flex items-center gap-2 p-3 text-sm text-red-700 bg-red-50 dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-800 rounded-lg animate-in fade-in">
           <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {successMessage && (
+      {successMessage && otpStatus === "idle" && (
         <div className="flex items-center gap-2 p-3 text-sm text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
           <span>{successMessage}</span>
@@ -145,7 +172,7 @@ export const LoginForm: React.FC = () => {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-3 text-muted-foreground font-medium">
+              <span className="bg-card dark:bg-zinc-950 px-3 text-muted-foreground font-medium">
                 or continue with
               </span>
             </div>
@@ -182,7 +209,7 @@ export const LoginForm: React.FC = () => {
         </form>
       )}
 
-      {/* STEP 2: 6-Digit OTP Form */}
+      {/* STEP 2: 6-Digit OTP Form - Collapse into Centered Square Animation (Exact Match to Video) */}
       {step === "OTP" && (
         <form
           onSubmit={(e) => {
@@ -191,8 +218,8 @@ export const LoginForm: React.FC = () => {
           }}
           className="space-y-6"
         >
-          {/* Edit Identifier Option */}
-          <div className="flex items-center justify-between text-xs bg-muted/50 p-2.5 rounded-lg border border-border">
+          {/* Change Identifier link */}
+          <div className="flex items-center justify-between text-xs bg-muted/40 p-2.5 rounded-lg border border-border">
             <span className="truncate text-muted-foreground">
               Code sent to:{" "}
               <strong className="text-foreground">{identifier}</strong>
@@ -200,74 +227,131 @@ export const LoginForm: React.FC = () => {
             <button
               type="button"
               onClick={handleEditIdentifier}
-              className="text-[#E8B931] hover:underline font-semibold flex items-center gap-1 shrink-0 ml-2"
+              className="text-[#E8B931] hover:underline font-semibold flex items-center gap-1 shrink-0 ml-2 cursor-pointer"
             >
               <ArrowLeft className="w-3 h-3" /> Change
             </button>
           </div>
 
-          {/* 6 Digit Input Boxes */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block text-center">
-              Enter 6-Digit Verification Code
-            </label>
-            <div className="flex justify-center gap-2 sm:gap-3">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => {
-                    otpInputsRef.current[index] = el;
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  disabled={loading}
-                  className="w-11 sm:w-12 h-13 sm:h-14 text-center text-xl font-bold rounded-xl border border-input bg-card text-foreground focus:border-[#E8B931] focus:ring-2 focus:ring-[#E8B931]/30 outline-none transition-all shadow-xs"
-                />
-              ))}
-            </div>
+          {/* Morphing OTP Container: 6 boxes when typing -> collapses into 1 centered square on success/failure */}
+          <div className="relative min-h-[72px] flex items-center justify-center my-3">
+            {/* STATE 1: 6 Individual Input Boxes with Golden/Amber Active Border (As shown in video) */}
+            {(otpStatus === "idle" || otpStatus === "verifying") && (
+              <div className="flex justify-center items-center gap-2 sm:gap-2.5 transition-all duration-300">
+                {otp.map((digit, index) => {
+                  const isFilled = Boolean(digit);
+                  return (
+                    <input
+                      key={index}
+                      ref={(el) => {
+                        otpInputsRef.current[index] = el;
+                      }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                      disabled={loading || otpStatus === "verifying"}
+                      className={cn(
+                        "w-11 sm:w-12 h-14 text-center text-xl sm:text-2xl font-bold rounded-2xl border bg-zinc-900/90 text-white outline-none transition-all duration-200",
+                        isFilled
+                          ? "border-[#E8B931] shadow-[0_0_14px_rgba(232,185,49,0.3)] ring-1 ring-[#E8B931]/40"
+                          : "border-white/10 hover:border-white/20",
+                        "focus:border-[#E8B931] focus:shadow-[0_0_18px_rgba(232,185,49,0.4)] focus:ring-1 focus:ring-[#E8B931]"
+                      )}
+                    />
+                  );
+                })}
+              </div>
+            )}
+
+            {/* STATE 2: Success Collapsed Centered Green Square with Animated White Checkmark (Exact Match to Video 00:00-00:01) */}
+            {otpStatus === "success" && (
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-[0_0_35px_rgba(16,185,129,0.6),0_0_12px_rgba(16,185,129,0.4)] animate-badge-pop transition-all">
+                <svg
+                  className="w-8 h-8 text-white drop-shadow-md"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" className="animate-check-draw" />
+                </svg>
+              </div>
+            )}
+
+            {/* STATE 3: Failure Collapsed Centered Red Square with Shake Animation & X (Exact Match to Video) */}
+            {otpStatus === "failure" && (
+              <div
+                onClick={resetOtpToIdle}
+                title="Click to retry"
+                className="w-16 h-16 rounded-2xl bg-rose-500 text-white flex items-center justify-center shadow-[0_0_35px_rgba(244,63,94,0.6),0_0_12px_rgba(244,63,94,0.4)] animate-otp-shake cursor-pointer group transition-all"
+              >
+                <svg
+                  className="w-8 h-8 text-white drop-shadow-md animate-badge-pop"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </div>
+            )}
           </div>
 
-          {/* Resend Timer / Action */}
-          <div className="text-center text-xs text-muted-foreground">
-            {!canResend ? (
-              <span>Resend code in {countdown}s</span>
+          {/* Subtext - Matching Video: "Didn't receive the code? Resend" */}
+          <div className="text-center text-xs text-muted-foreground pt-1">
+            {otpStatus === "success" ? (
+              <p className="text-xs text-emerald-400 font-medium animate-pulse">
+                Redirecting to your dashboard...
+              </p>
+            ) : otpStatus === "failure" ? (
+              <button
+                type="button"
+                onClick={resetOtpToIdle}
+                className="text-rose-400 hover:underline font-semibold cursor-pointer"
+              >
+                Click the red icon or here to retry
+              </button>
+            ) : !canResend ? (
+              <span>Didn't receive the code? Resend in {countdown}s</span>
             ) : (
               <button
                 type="button"
                 onClick={handleResendOtp}
-                disabled={loading}
+                disabled={loading || otpStatus !== "idle"}
                 className="text-[#E8B931] hover:underline font-semibold cursor-pointer"
               >
-                Didn't receive code? Resend OTP
+                Didn't receive the code? <span className="underline font-bold">Resend</span>
               </button>
             )}
           </div>
 
-          {/* Classy Light Yellow Verify Button */}
-          <Button
-            type="submit"
-            disabled={loading || otp.join("").length !== 6}
-            className={classyYellowBtnClasses}
-          >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
-              </span>
-            ) : (
-              "Verify & Login"
-            )}
-          </Button>
+          {/* Manual Verify Button (shown when idle for accessibility) */}
+          {otpStatus === "idle" && (
+            <Button
+              type="submit"
+              disabled={loading || otp.join("").length !== 6}
+              className={classyYellowBtnClasses}
+            >
+              Verify & Login
+            </Button>
+          )}
 
           {/* Back button */}
           <Button
             type="button"
             variant="ghost"
             onClick={handleEditIdentifier}
-            className="w-full text-muted-foreground hover:text-foreground text-sm"
+            disabled={otpStatus !== "idle"}
+            className="w-full text-muted-foreground hover:text-foreground text-sm cursor-pointer"
           >
             Use a different phone or email
           </Button>
@@ -277,7 +361,7 @@ export const LoginForm: React.FC = () => {
       {/* STEP 3: Success State */}
       {step === "SUCCESS" && (
         <div className="text-center space-y-5 py-4">
-          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
+          <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(16,185,129,0.4)] border border-emerald-500/40 animate-badge-pop">
             <CheckCircle2 className="w-9 h-9" />
           </div>
           <div className="space-y-1">

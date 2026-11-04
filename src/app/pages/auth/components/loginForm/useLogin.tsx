@@ -10,11 +10,13 @@ import {
 } from '../../auth.service'
 
 export type AuthStep = 'IDENTIFIER' | 'OTP' | 'SUCCESS'
+export type OtpVerificationStatus = 'idle' | 'verifying' | 'success' | 'failure'
 
 export function useLogin() {
   const [step, setStep] = useState<AuthStep>('IDENTIFIER')
   const [identifier, setIdentifier] = useState<string>('')
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', ''])
+  const [otpStatus, setOtpStatus] = useState<OtpVerificationStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [countdown, setCountdown] = useState<number>(30)
@@ -43,6 +45,7 @@ export function useLogin() {
   // Auto focus first OTP input on transition to OTP step
   useEffect(() => {
     if (step === 'OTP') {
+      setOtpStatus('idle')
       setTimeout(() => {
         otpInputsRef.current[0]?.focus()
       }, 100)
@@ -60,6 +63,7 @@ export function useLogin() {
 
     setErrorMessage(null)
     setSuccessMessage(null)
+    setOtpStatus('idle')
 
     // Test bypass flow
     if (isTestBypassIdentifier(targetIdentifier)) {
@@ -88,6 +92,8 @@ export function useLogin() {
 
   // Handle OTP digit changes
   const handleOtpChange = (index: number, value: string) => {
+    if (otpStatus !== 'idle') return
+
     // Only accept numeric inputs
     if (value && !/^\d+$/.test(value)) return
 
@@ -102,6 +108,10 @@ export function useLogin() {
       setOtp(newOtp)
       const nextIndex = Math.min(pastedDigits.length, 5)
       otpInputsRef.current[nextIndex]?.focus()
+
+      if (newOtp.every((d) => d !== '')) {
+        handleVerifyOtp(newOtp)
+      }
       return
     }
 
@@ -112,10 +122,17 @@ export function useLogin() {
     if (value && index < 5) {
       otpInputsRef.current[index + 1]?.focus()
     }
+
+    // Auto verify if all 6 digits are filled
+    if (value && index === 5 && newOtp.every((d) => d !== '')) {
+      handleVerifyOtp(newOtp)
+    }
   }
 
   // Handle Backspace in OTP
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (otpStatus !== 'idle') return
+
     if (e.key === 'Backspace') {
       if (!otp[index] && index > 0) {
         otpInputsRef.current[index - 1]?.focus()
@@ -123,33 +140,65 @@ export function useLogin() {
     }
   }
 
-  // Handle OTP verification
-  const handleVerifyOtp = async () => {
-    const fullOtp = otp.join('')
+  // Reset OTP status and clear digits for retry
+  const resetOtpToIdle = () => {
+    setOtpStatus('idle')
+    setOtp(['', '', '', '', '', ''])
+    setErrorMessage(null)
+    setTimeout(() => {
+      otpInputsRef.current[0]?.focus()
+    }, 60)
+  }
+
+  // Handle OTP verification with combined animation & badge
+  const handleVerifyOtp = async (targetOtpDigits?: string[]) => {
+    if (otpStatus !== 'idle') return
+
+    const digitsToVerify = targetOtpDigits || otp
+    const fullOtp = digitsToVerify.join('')
+
     if (fullOtp.length !== 6) {
       setErrorMessage('Please enter all 6 digits of the OTP')
       return
     }
 
     setErrorMessage(null)
+    setOtpStatus('verifying')
 
     // Test bypass flow
-    if (
-      isTestBypassIdentifier(identifier) ||
-      fullOtp === TEST_BYPASS.otp ||
-      fullOtp === '123456'
-    ) {
+    if (isTestBypassIdentifier(identifier)) {
       setIsBypassLoading(true)
+
       setTimeout(() => {
         setIsBypassLoading(false)
-        const mockToken = 'mock_jwt_token_' + Date.now()
-        localStorage.setItem('token', mockToken)
-        setSuccessMessage('Login successful via test bypass!')
-        setStep('SUCCESS')
-      }, 400)
+
+        if (fullOtp === TEST_BYPASS.otp || fullOtp === '123456') {
+          // Trigger SUCCESS combined box animation & badge
+          setOtpStatus('success')
+          setSuccessMessage('Code verified successfully!')
+
+          // Transition to success screen after badge animation display
+          setTimeout(() => {
+            const mockToken = 'mock_jwt_token_' + Date.now()
+            localStorage.setItem('token', mockToken)
+            setStep('SUCCESS')
+            setOtpStatus('idle')
+          }, 1400)
+        } else {
+          // Trigger FAILURE combined box animation & badge
+          setOtpStatus('failure')
+          setErrorMessage(`Invalid test OTP "${fullOtp}". Test code is ${TEST_BYPASS.otp}`)
+
+          // Revert back to 6 inputs after failure animation
+          setTimeout(() => {
+            resetOtpToIdle()
+          }, 1800)
+        }
+      }, 350)
       return
     }
 
+    // Real API verification
     try {
       const response = await verifyOtpMutation.mutateAsync({
         identifier,
@@ -160,18 +209,29 @@ export function useLogin() {
         localStorage.setItem('token', response.token)
       }
 
+      setOtpStatus('success')
       setSuccessMessage(response?.message || 'Verification successful!')
-      setStep('SUCCESS')
+
+      setTimeout(() => {
+        setStep('SUCCESS')
+        setOtpStatus('idle')
+      }, 1400)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid OTP. Please check and try again.'
+      setOtpStatus('failure')
       setErrorMessage(message)
+
+      setTimeout(() => {
+        resetOtpToIdle()
+      }, 1800)
     }
   }
 
   // Resend OTP
   const handleResendOtp = async () => {
-    if (!canResend || loading) return
+    if (!canResend || loading || otpStatus !== 'idle') return
     setOtp(['', '', '', '', '', ''])
+    setOtpStatus('idle')
     await handleRequestOtp(identifier)
   }
 
@@ -179,6 +239,7 @@ export function useLogin() {
   const handleEditIdentifier = () => {
     setStep('IDENTIFIER')
     setOtp(['', '', '', '', '', ''])
+    setOtpStatus('idle')
     setErrorMessage(null)
     setSuccessMessage(null)
   }
@@ -188,6 +249,7 @@ export function useLogin() {
     const cred = type === 'email' ? TEST_BYPASS.email : TEST_BYPASS.mobile
     setIdentifier(cred)
     setErrorMessage(null)
+    setOtpStatus('idle')
   }
 
   // Google OAuth placeholder
@@ -204,6 +266,7 @@ export function useLogin() {
     identifier,
     setIdentifier,
     otp,
+    otpStatus,
     loading,
     errorMessage,
     successMessage,
@@ -218,6 +281,7 @@ export function useLogin() {
     handleEditIdentifier,
     fillTestCredentials,
     handleGoogleLogin,
+    resetOtpToIdle,
     testBypass: TEST_BYPASS,
   }
 }

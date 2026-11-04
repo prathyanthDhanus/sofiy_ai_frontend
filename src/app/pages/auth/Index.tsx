@@ -3,6 +3,7 @@ import loginImg from '@/assets/login.jpg'
 import { LoginForm } from './components/loginForm'
 import { AuthVectorBackground } from './components/AuthVectorBackground'
 import { Sparkles, GraduationCap, ShieldCheck } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 export const AuthPage: React.FC = () => {
   return (
@@ -44,10 +45,9 @@ export const AuthPage: React.FC = () => {
         </div>
 
         {/* Top-Right Status Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900/70 border border-white/10 text-xs font-medium text-zinc-300 backdrop-blur-md shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-[#E8B931] animate-pulse shadow-[0_0_8px_#E8B931]" />
-          <span>AI Learning Platform</span>
-        </div>
+        
+          <Badge variant="outline" className="h-6"> <span className="w-2 h-2 rounded-full bg-[#E8B931] animate-pulse shadow-[0_0_8px_#E8B931] " />AI Learning Platform</Badge>
+       
       </header>
 
       {/* Main Content Area: Organic, non-partitioned layout */}

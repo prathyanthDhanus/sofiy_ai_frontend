@@ -128,3 +128,53 @@
     @apply font-sans;
     }
 }
+
+/* OTP Combine & Feedback Animations */
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0) scale(1); }
+  15%, 45%, 75% { transform: translateX(-7px) scale(0.99); }
+  30%, 60%, 90% { transform: translateX(7px) scale(1.01); }
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes checkmark-draw {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes glow-emerald {
+  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 0 10px rgba(16, 185, 129, 0.15); }
+  50% { box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), inset 0 0 15px rgba(16, 185, 129, 0.3); }
+}
+
+@keyframes glow-rose {
+  0%, 100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.35), inset 0 0 10px rgba(244, 63, 94, 0.15); }
+  50% { box-shadow: 0 0 35px rgba(244, 63, 94, 0.6), inset 0 0 15px rgba(244, 63, 94, 0.3); }
+}
+
+.animate-otp-shake {
+  animation: otp-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.animate-badge-pop {
+  animation: badge-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.animate-check-draw {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmark-draw 0.4s ease-out 0.15s forwards;
+}
+
+.animate-glow-emerald {
+  animation: glow-emerald 1.2s ease-in-out infinite;
+}
+
+.animate-glow-rose {
+  animation: glow-rose 0.6s ease-in-out infinite;
+}
