@@ -5,7 +5,11 @@ import { useLogin } from "./useLogin";
 import { ArrowLeft, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { cn } from "cn";
 
-export const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onSuccess?: () => void
+}
+
+export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const {
     step,
     identifier,
@@ -28,7 +32,7 @@ export const LoginForm: React.FC = () => {
     handleGoogleLogin,
     resetOtpToIdle,
     testBypass,
-  } = useLogin();
+  } = useLogin({ onSuccess });
 
   // Classy light yellow button styling with white text
   const classyYellowBtnClasses =
@@ -172,7 +176,7 @@ export const LoginForm: React.FC = () => {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card dark:bg-zinc-950 px-3 text-muted-foreground font-medium">
+              <span className="bg-[#07090e] px-3 text-muted-foreground font-medium">
                 or continue with
               </span>
             </div>

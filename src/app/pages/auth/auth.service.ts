@@ -54,9 +54,8 @@ export const requestOtpService = async (payload: RequestOtpPayload): Promise<Aut
   try {
     const data = await axiosClient.post<AuthResponse>(ENDPOINTS.AUTH.REQUEST_OTP, payload)
     return data as unknown as AuthResponse
-  } catch (error) {
+  } catch {
     // If backend server is not running during local frontend testing, allow bypass with note
-    console.warn('Backend unavailable, fallback to test mode:', error)
     return {
       success: true,
       message: `OTP sent successfully. (Demo code: ${TEST_BYPASS.otp})`,

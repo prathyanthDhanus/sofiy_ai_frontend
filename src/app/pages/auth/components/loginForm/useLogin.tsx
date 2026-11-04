@@ -12,7 +12,7 @@ import {
 export type AuthStep = 'IDENTIFIER' | 'OTP' | 'SUCCESS'
 export type OtpVerificationStatus = 'idle' | 'verifying' | 'success' | 'failure'
 
-export function useLogin() {
+export function useLogin(options?: { onSuccess?: () => void }) {
   const [step, setStep] = useState<AuthStep>('IDENTIFIER')
   const [identifier, setIdentifier] = useState<string>('')
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', ''])
@@ -45,10 +45,11 @@ export function useLogin() {
   // Auto focus first OTP input on transition to OTP step
   useEffect(() => {
     if (step === 'OTP') {
-      setOtpStatus('idle')
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        setOtpStatus('idle')
         otpInputsRef.current[0]?.focus()
-      }, 100)
+      }, 50)
+      return () => clearTimeout(timer)
     }
   }, [step])
 
@@ -177,12 +178,13 @@ export function useLogin() {
           setOtpStatus('success')
           setSuccessMessage('Code verified successfully!')
 
-          // Transition to success screen after badge animation display
+          // Transition to admin after badge animation display
           setTimeout(() => {
             const mockToken = 'mock_jwt_token_' + Date.now()
             localStorage.setItem('token', mockToken)
             setStep('SUCCESS')
             setOtpStatus('idle')
+            options?.onSuccess?.()
           }, 1400)
         } else {
           // Trigger FAILURE combined box animation & badge
@@ -215,6 +217,7 @@ export function useLogin() {
       setTimeout(() => {
         setStep('SUCCESS')
         setOtpStatus('idle')
+        options?.onSuccess?.()
       }, 1400)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid OTP. Please check and try again.'
