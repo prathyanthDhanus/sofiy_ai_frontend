@@ -15,8 +15,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table'
 import type { ColumnDef, FilterConfig } from '@/components/data-table'
-import { mockHRCandidates } from '../data/mockHRCandidates'
-import type { HRCandidate } from '../data/mockHRCandidates'
+import { mockHRCandidates } from '@/layout/data/mockHRCandidates'
+import type { HRCandidate } from '@/layout/data/mockHRCandidates'
 import { toast } from 'sonner'
 
 export const AdminDashboardPreview: React.FC = () => {

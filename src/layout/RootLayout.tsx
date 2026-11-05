@@ -4,7 +4,8 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { AdminSidebar } from './components/AdminSidebar'
 import { AdminNavbar } from './components/AdminNavbar'
 import { AdminFooter } from './components/AdminFooter'
-import { AdminDashboardPreview } from './components/AdminDashboardPreview'
+import { AdminDashboardPreview } from '@/app/pages/dashboard/AdminDashboardPreview'
+import { ChatbotWidget } from '@/components/chatbot'
 
 export interface RootLayoutProps {
   children?: React.ReactNode
@@ -39,6 +40,9 @@ export const RootLayout: React.FC<RootLayoutProps> = ({ children, onNavigateToAu
             <AdminFooter />
           </SidebarInset>
         </div>
+
+        {/* Global AI Chatbot Assistant Widget */}
+        <ChatbotWidget />
       </SidebarProvider>
     </TooltipProvider>
   )

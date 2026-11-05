@@ -7,10 +7,10 @@ import type { ModuleItem } from '../types/navigation'
 export const defaultModules: ModuleItem[] = [
   {
     id: 'ai-recruitment',
-    title: 'AI Talent & Recruitment',
-    description: 'Candidate sourcing, AI video interviews & resume screening',
+    title: 'Job Creation',
+    description: 'Create the right job requisitions, roles & interview pipelines with AI assistance',
     icon: 'Briefcase',
-    badge: 'Core',
+    badge: 'Core',  
     menus: [
       {
         id: 'hr-dashboard',
@@ -19,11 +19,11 @@ export const defaultModules: ModuleItem[] = [
       },
       {
         id: 'candidate-pipeline',
-        title: 'AI Interview Pipeline',
+        title: 'Create Job',
         icon: 'Radio',
         badge: '18',
         submenus: [
-          { id: 'active-interviews', title: 'Active AI Screenings', icon: 'Bot' },
+          { id: 'active-interviews', title: 'Create a job vacancy', icon: 'Bot' },
           { id: 'interview-transcripts', title: 'Interview Transcripts', icon: 'History' },
           { id: 'sentiment-analysis', title: 'Candidate Sentiment & Fit', icon: 'Sparkles' },
         ],
