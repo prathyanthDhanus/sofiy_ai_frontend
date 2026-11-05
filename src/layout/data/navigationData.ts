@@ -1,103 +1,108 @@
 import type { ModuleItem } from '../types/navigation'
 
 /**
- * Default static modules and menus representing backend payload structure.
+ * Default static modules and menus representing AI HR backend payload structure.
  * When backend API is ready, this same shape can be returned directly.
  */
 export const defaultModules: ModuleItem[] = [
   {
-    id: 'ai-tutoring',
-    title: 'AI Tutoring & Learning',
-    description: 'Adaptive mentoring, voice chat & lesson plans',
-    icon: 'Bot',
+    id: 'ai-recruitment',
+    title: 'AI Talent & Recruitment',
+    description: 'Candidate sourcing, AI video interviews & resume screening',
+    icon: 'Briefcase',
     badge: 'Core',
     menus: [
       {
-        id: 'tutor-dashboard',
-        title: 'Tutor Overview',
+        id: 'hr-dashboard',
+        title: 'HR Overview',
         icon: 'LayoutDashboard',
       },
       {
-        id: 'live-sessions',
-        title: 'Live Tutoring Sessions',
+        id: 'candidate-pipeline',
+        title: 'AI Interview Pipeline',
         icon: 'Radio',
-        badge: '18 Live',
+        badge: '18',
         submenus: [
-          { id: 'active-voice', title: 'Active Voice & Chat', icon: 'Bot' },
-          { id: 'session-history', title: 'Session Transcripts', icon: 'History' },
-          { id: 'sentiment-analysis', title: 'Learner Sentiment', icon: 'Sparkles' },
+          { id: 'active-interviews', title: 'Active AI Screenings', icon: 'Bot' },
+          { id: 'interview-transcripts', title: 'Interview Transcripts', icon: 'History' },
+          { id: 'sentiment-analysis', title: 'Candidate Sentiment & Fit', icon: 'Sparkles' },
         ],
       },
       {
-        id: 'curriculum-mgmt',
-        title: 'Curriculum & Lessons',
-        icon: 'BookOpen',
+        id: 'requisitions-mgmt',
+        title: 'Job Requisitions & Roles',
+        icon: 'FileText',
         submenus: [
-          { id: 'adaptive-plans', title: 'Adaptive Lesson Plans', icon: 'FileText' },
-          { id: 'quiz-engine', title: 'AI Quiz Generator', icon: 'HelpCircle' },
-          { id: 'knowledge-graph', title: 'Subject Knowledge Tree', icon: 'GitFork' },
+          { id: 'open-positions', title: 'Open Job Positions', icon: 'FileSpreadsheet' },
+          { id: 'resume-matcher', title: 'AI Resume Matcher', icon: 'HelpCircle' },
+          { id: 'competency-matrix', title: 'Skills & Competency Map', icon: 'GitFork' },
         ],
       },
       {
-        id: 'diagnostics',
-        title: 'Learning Diagnostics',
+        id: 'recruitment-metrics',
+        title: 'Hiring Funnel Analytics',
         icon: 'BarChart3',
       },
     ],
   },
   {
-    id: 'student-admin',
-    title: 'Learner Administration',
-    description: 'Cohort enrollment, progress & user directories',
+    id: 'workforce-admin',
+    title: 'Workforce & Employees',
+    description: 'Staff directory, onboarding, performance & attendance',
     icon: 'Users',
     menus: [
       {
-        id: 'student-directory',
-        title: 'Learners Directory',
+        id: 'employee-directory',
+        title: 'Employee Directory',
         icon: 'Users',
         submenus: [
-          { id: 'all-learners', title: 'All Enrolled Students', icon: 'UserCheck' },
-          { id: 'at-risk-learners', title: 'Intervention Alerts', badge: '3 Alerts', icon: 'AlertTriangle' },
-          { id: 'new-invites', title: 'Pending Invites', icon: 'UserPlus' },
+          { id: 'all-employees', title: 'All Staff Members', icon: 'UserCheck' },
+          { id: 'retention-risk', title: 'Retention & At-Risk Alerts', badge: '3', icon: 'AlertTriangle' },
+          { id: 'onboarding-queue', title: 'Onboarding Pipeline', icon: 'UserPlus' },
         ],
       },
       {
-        id: 'cohorts',
-        title: 'Class Cohorts',
-        icon: 'GraduationCap',
+        id: 'departments',
+        title: 'Departments & Teams',
+        icon: 'Layers',
       },
       {
-        id: 'engagement',
-        title: 'Attendance & Engagement',
+        id: 'attendance-leave',
+        title: 'Attendance & Time Off',
         icon: 'CalendarCheck',
+      },
+      {
+        id: 'performance-reviews',
+        title: 'Performance & OKRs',
+        icon: 'Award',
       },
     ],
   },
   {
     id: 'ai-engine',
-    title: 'AI Engine & Vector Base',
-    description: 'Knowledge embeddings, prompt tuning & safety',
+    title: 'AI HR Engine & Policies',
+    description: 'HR policy embeddings, copilot tuning & labor compliance',
     icon: 'BrainCircuit',
     badge: 'v2.4',
     menus: [
       {
         id: 'knowledge-store',
-        title: 'Knowledge Repositories',
+        title: 'HR Knowledge Repositories',
         icon: 'Database',
         submenus: [
-          { id: 'textbooks', title: 'Textbooks & Documents', icon: 'FileSpreadsheet' },
-          { id: 'embeddings-index', title: 'Vector Embeddings', icon: 'Cpu' },
-          { id: 'data-sync', title: 'Data Source Sync', icon: 'RefreshCw' },
+          { id: 'handbooks-policies', title: 'Handbooks & SOP Documents', icon: 'FileSpreadsheet' },
+          { id: 'embeddings-index', title: 'Policy Vector Embeddings', icon: 'Cpu' },
+          { id: 'hris-sync', title: 'HRIS & Payroll Data Sync', icon: 'RefreshCw' },
         ],
       },
       {
         id: 'prompt-engineering',
-        title: 'Tutor Prompt Studio',
+        title: 'HR Copilot Prompt Studio',
         icon: 'Sparkles',
       },
       {
         id: 'audit-compliance',
-        title: 'Safety & Audit Logs',
+        title: 'Labor Law & Safety Compliance',
         icon: 'FileCheck',
       },
     ],
@@ -105,7 +110,7 @@ export const defaultModules: ModuleItem[] = [
   {
     id: 'system-settings',
     title: 'System & Security',
-    description: 'Access controls, roles & platform configuration',
+    description: 'Role-based permissions, SSO & ATS integrations',
     icon: 'Settings',
     menus: [
       {
@@ -120,7 +125,7 @@ export const defaultModules: ModuleItem[] = [
       },
       {
         id: 'api-webhooks',
-        title: 'API Keys & Webhooks',
+        title: 'API Keys & ATS Integrations',
         icon: 'Link',
       },
     ],

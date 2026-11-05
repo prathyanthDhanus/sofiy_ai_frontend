@@ -32,7 +32,7 @@ export function getInitialTheme(): Theme {
     return 'dark'
   }
 
-  // Default to dark theme for Sofiy AI Tutor's cinematic design
+  // Default to dark theme for Sofiy AI HR's cinematic design
   return 'dark'
 }
 

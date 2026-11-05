@@ -24,8 +24,8 @@ export function useDataTable<T>({
   // 1. Search Query State
   const [searchQuery, setSearchQuery] = useState('')
 
-  // 2. Active Filters State
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({})
+  // 2. Active Filters State (supports multi-select array per filter id)
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({})
 
   // 3. Sorting State
   const [sortState, setSortState] = useState<SortState | null>(null)
@@ -113,12 +113,57 @@ export function useDataTable<T>({
     })
   }, [])
 
-  // Filter change handler
-  const handleFilterChange = useCallback((filterId: string, value: string) => {
-    setActiveFilters((prev) => ({
-      ...prev,
-      [filterId]: value,
-    }))
+  // Filter change handler: accepts single string, array of strings, or resets
+  const handleFilterChange = useCallback((filterId: string, value: string | string[]) => {
+    setActiveFilters((prev) => {
+      const next = { ...prev }
+      if (Array.isArray(value)) {
+        if (value.length === 0 || value.includes('all')) {
+          delete next[filterId]
+        } else {
+          next[filterId] = value
+        }
+      } else {
+        if (!value || value === 'all') {
+          delete next[filterId]
+        } else {
+          next[filterId] = [value]
+        }
+      }
+      return next
+    })
+    setCurrentPage(1)
+  }, [])
+
+  // Toggle single filter option value in/out of multi-select list
+  const toggleFilterValue = useCallback((filterId: string, value: string) => {
+    setActiveFilters((prev) => {
+      const next = { ...prev }
+      const currentList = next[filterId] ? [...next[filterId]] : []
+      const idx = currentList.indexOf(value)
+      if (idx >= 0) {
+        currentList.splice(idx, 1)
+      } else {
+        currentList.push(value)
+      }
+
+      if (currentList.length === 0) {
+        delete next[filterId]
+      } else {
+        next[filterId] = currentList
+      }
+      return next
+    })
+    setCurrentPage(1)
+  }, [])
+
+  // Clear single filter
+  const clearFilter = useCallback((filterId: string) => {
+    setActiveFilters((prev) => {
+      const next = { ...prev }
+      delete next[filterId]
+      return next
+    })
     setCurrentPage(1)
   }, [])
 
@@ -163,12 +208,14 @@ export function useDataTable<T>({
       })
     }
 
-    // Apply Filters
+    // Apply Filters (Multi-select support)
     if (filters.length > 0) {
       result = result.filter((row) => {
         return filters.every((filter) => {
-          const activeVal = activeFilters[filter.id]
-          if (!activeVal || activeVal === 'all') return true
+          const selectedValues = activeFilters[filter.id]
+          if (!selectedValues || selectedValues.length === 0 || selectedValues.includes('all')) {
+            return true
+          }
 
           let rowVal: unknown = ''
           if (filter.accessorFn) {
@@ -176,7 +223,10 @@ export function useDataTable<T>({
           } else if (filter.accessorKey) {
             rowVal = row[filter.accessorKey]
           }
-          return String(rowVal).toLowerCase() === String(activeVal).toLowerCase()
+          const normalizedRowVal = String(rowVal ?? '').toLowerCase().trim()
+          return selectedValues.some(
+            (val) => String(val).toLowerCase().trim() === normalizedRowVal
+          )
         })
       })
     }
@@ -260,6 +310,8 @@ export function useDataTable<T>({
     setSearchQuery,
     activeFilters,
     handleFilterChange,
+    toggleFilterValue,
+    clearFilter,
     clearAllFilters,
     sortState,
     handleSort,

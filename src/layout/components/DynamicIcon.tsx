@@ -28,6 +28,10 @@ import {
   Link,
   Layers,
   Folder,
+  Briefcase,
+  Award,
+  Building2,
+  Target,
   type LucideProps,
 } from 'lucide-react'
 
@@ -60,6 +64,10 @@ const iconMap: Record<string, React.FC<LucideProps>> = {
   Link,
   Layers,
   Folder,
+  Briefcase,
+  Award,
+  Building2,
+  Target,
 }
 
 export interface DynamicIconProps extends LucideProps {

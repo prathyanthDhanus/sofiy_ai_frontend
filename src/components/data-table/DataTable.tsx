@@ -19,6 +19,7 @@ import { useDataTable } from './useDataTable'
 import type { DataTableProps, DeleteModalConfig, TableDensity } from './types'
 import { Loader2, Inbox, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 export function DataTable<T>({
   data,
@@ -44,6 +45,9 @@ export function DataTable<T>({
   emptyMessage,
   className = '',
   bulkActions,
+  enableExportExcel = false,
+  onExportExcel,
+  exportExcelFilename,
 }: DataTableProps<T>) {
   const table = useDataTable<T>({
     data,
@@ -130,6 +134,57 @@ export function DataTable<T>({
   // Filter columns by visibility
   const displayedColumns = columns.filter((col) => table.visibleColumns.has(col.id))
 
+  // Export to Excel handler
+  const handleExportExcel = () => {
+    if (onExportExcel) {
+      onExportExcel(table.filteredData, displayedColumns)
+      return
+    }
+
+    try {
+      const headers = displayedColumns.map((col) =>
+        typeof col.header === 'string' ? col.header : col.id
+      )
+
+      const rows = table.filteredData.map((row) =>
+        displayedColumns
+          .map((col) => {
+            let value: unknown = ''
+            if (col.accessorKey) {
+              value = (row as Record<string, unknown>)[col.accessorKey as string]
+            } else if (col.accessorFn) {
+              value = col.accessorFn(row)
+            }
+            const cleanString = String(value ?? '').replace(/"/g, '""')
+            return `"${cleanString}"`
+          })
+          .join(',')
+      )
+
+      const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows].join('\r\n')
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const downloadUrl = URL.createObjectURL(blob)
+      const downloadLink = document.createElement('a')
+      const baseName =
+        exportExcelFilename ||
+        (title ? title.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'table_export')
+      const fileName = `${baseName}_${new Date().toISOString().slice(0, 10)}.csv`
+
+      downloadLink.setAttribute('href', downloadUrl)
+      downloadLink.setAttribute('download', fileName)
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      document.body.removeChild(downloadLink)
+      URL.revokeObjectURL(downloadUrl)
+
+      toast.success('Excel spreadsheet downloaded', {
+        description: `Exported ${table.filteredData.length} records to ${fileName}`,
+      })
+    } catch {
+      toast.error('Failed to export Excel spreadsheet')
+    }
+  }
+
   // Has actions
   const hasActions =
     showActionsColumn &&
@@ -185,6 +240,8 @@ export function DataTable<T>({
           filters={filters}
           activeFilters={table.activeFilters}
           onFilterChange={table.handleFilterChange}
+          onToggleFilterValue={table.toggleFilterValue}
+          onClearFilter={table.clearFilter}
           onClearFilters={table.clearAllFilters}
           columns={columns}
           visibleColumns={table.visibleColumns}
@@ -196,6 +253,8 @@ export function DataTable<T>({
           onToggleFullscreen={table.toggleFullscreen}
           totalCount={data.length}
           filteredCount={table.totalItems}
+          enableExportExcel={enableExportExcel || Boolean(onExportExcel)}
+          onExportExcel={handleExportExcel}
         />
 
         {/* Selected Rows Bulk Action Banner */}

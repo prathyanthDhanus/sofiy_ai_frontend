@@ -49,7 +49,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       {/* Header - Dynamically updates just like the video demo */}
       <div className="space-y-2">
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground transition-all">
-          {step === "IDENTIFIER" && "Welcome to Sofiy AI Tutor"}
+          {step === "IDENTIFIER" && "Welcome to Sofiy AI HR"}
           {step === "OTP" && otpStatus === "success" && (
             <span className="text-white animate-badge-pop inline-block">
               Verified successfully

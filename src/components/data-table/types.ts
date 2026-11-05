@@ -83,4 +83,7 @@ export interface DataTableProps<T> {
   emptyMessage?: React.ReactNode
   className?: string
   bulkActions?: (selectedIds: (string | number)[], selectedRows: T[]) => React.ReactNode
+  enableExportExcel?: boolean
+  onExportExcel?: (filteredData: T[], visibleColumns: ColumnDef<T>[]) => void
+  exportExcelFilename?: string
 }

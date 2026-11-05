@@ -39,7 +39,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search students, courses, AI tutor logs..."
+            placeholder="Search candidates, employees, job requisitions, AI HR logs..."
             className="pl-9 pr-14 h-9 rounded-xl bg-muted/40 border-border text-xs focus-visible:ring-[#E8B931]/30 focus-visible:border-[#E8B931]"
           />
           <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground bg-card px-1.5 py-0.5 rounded border border-border">
@@ -53,7 +53,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
         {/* Live AI Status Badge */}
         <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>AI Core Active</span>
+          <span>AI HR Core Active</span>
         </div>
 
         {/* Day / Night Animated Theme Switch */}

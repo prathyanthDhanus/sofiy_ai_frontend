@@ -12,7 +12,7 @@ export interface RootLayoutProps {
 }
 
 export const RootLayout: React.FC<RootLayoutProps> = ({ children, onNavigateToAuth }) => {
-  const [activeItem, setActiveItem] = useState<string>('tutor-dashboard')
+  const [activeItem, setActiveItem] = useState<string>('hr-dashboard')
 
   return (
     <TooltipProvider delayDuration={0}>

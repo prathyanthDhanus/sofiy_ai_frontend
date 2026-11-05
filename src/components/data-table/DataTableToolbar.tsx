@@ -7,17 +7,19 @@ import {
   Rows3,
   Rows4,
   AlignJustify,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Tooltip,
   TooltipContent,
@@ -26,14 +28,17 @@ import {
 } from '@/components/ui/tooltip'
 import { DataTableColumnVisibility } from './DataTableColumnVisibility'
 import type { ColumnDef, FilterConfig, TableDensity } from './types'
+import { cn } from '@/lib/utils'
 
 export interface DataTableToolbarProps<T> {
   searchQuery: string
   onSearchChange: (query: string) => void
   searchPlaceholder?: string
   filters?: FilterConfig<T>[]
-  activeFilters: Record<string, string>
-  onFilterChange: (filterId: string, value: string) => void
+  activeFilters: Record<string, string[]> | Record<string, string>
+  onFilterChange: (filterId: string, value: string | string[]) => void
+  onToggleFilterValue?: (filterId: string, value: string) => void
+  onClearFilter?: (filterId: string) => void
   onClearFilters: () => void
   columns: ColumnDef<T>[]
   visibleColumns: Set<string>
@@ -45,6 +50,8 @@ export interface DataTableToolbarProps<T> {
   onToggleFullscreen: () => void
   totalCount: number
   filteredCount: number
+  enableExportExcel?: boolean
+  onExportExcel?: () => void
 }
 
 export function DataTableToolbar<T>({
@@ -54,6 +61,8 @@ export function DataTableToolbar<T>({
   filters = [],
   activeFilters,
   onFilterChange,
+  onToggleFilterValue,
+  onClearFilter,
   onClearFilters,
   columns,
   visibleColumns,
@@ -65,10 +74,16 @@ export function DataTableToolbar<T>({
   onToggleFullscreen,
   totalCount,
   filteredCount,
+  enableExportExcel = false,
+  onExportExcel,
 }: DataTableToolbarProps<T>) {
   const hasActiveFilters =
     Boolean(searchQuery) ||
-    Object.values(activeFilters).some((val) => val && val !== 'all')
+    Object.values(activeFilters).some((val) => {
+      if (!val) return false
+      if (Array.isArray(val)) return val.length > 0 && !val.every((v) => v === 'all')
+      return val !== 'all'
+    })
 
   const getDensityIcon = () => {
     switch (density) {
@@ -122,45 +137,108 @@ export function DataTableToolbar<T>({
               )}
             </div>
 
-            {/* Filter Dropdowns */}
+            {/* Multi-Select Filter Dropdowns */}
             {filters.map((filter) => {
-              const currentValue = activeFilters[filter.id] || 'all'
+              const rawValues = activeFilters[filter.id]
+              const currentValues = Array.isArray(rawValues)
+                ? rawValues.filter((v) => v && v !== 'all')
+                : rawValues && rawValues !== 'all'
+                ? [rawValues]
+                : []
+              const hasSelected = currentValues.length > 0
+
               return (
-                <Select
-                  key={filter.id}
-                  value={currentValue}
-                  onValueChange={(val) => onFilterChange(filter.id, val)}
-                >
-                  <SelectTrigger className="h-9 min-w-[130px] rounded-xl text-xs border-border bg-background">
-                    <div className="flex items-center gap-1.5 truncate">
-                      <Filter className="w-3 h-3 text-muted-foreground shrink-0" />
-                      <span className="text-muted-foreground">{filter.title}:</span>
-                      <SelectValue placeholder="All" />
+                <DropdownMenu key={filter.id}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        'h-9 px-3 gap-1.5 rounded-xl border-border bg-card hover:bg-muted/60 text-xs font-medium cursor-pointer shadow-xs transition-colors',
+                        hasSelected ? 'border-[#E8B931]/60 text-foreground bg-muted/40 font-semibold' : ''
+                      )}
+                      aria-label={`Filter by ${filter.title}`}
+                    >
+                      <Filter className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span>{filter.title}</span>
+                      {hasSelected ? (
+                        <Badge
+                          variant="secondary"
+                          className="ml-1 h-4.5 min-w-4.5 px-1.5 rounded-md bg-[#E8B931] text-zinc-950 font-bold text-[10px]"
+                        >
+                          {currentValues.length}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground ml-0.5">All</span>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-56 p-2 border-border bg-card shadow-xl space-y-1"
+                  >
+                    <div className="flex items-center justify-between px-2 py-1">
+                      <DropdownMenuLabel className="p-0 text-xs font-bold text-foreground">
+                        {filter.title}
+                      </DropdownMenuLabel>
+                      {hasSelected && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (onClearFilter) {
+                              onClearFilter(filter.id)
+                            } else {
+                              onFilterChange(filter.id, 'all')
+                            }
+                          }}
+                          className="h-5 px-1.5 text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          Reset
+                        </Button>
+                      )}
                     </div>
-                  </SelectTrigger>
-                  <SelectContent className="border-border bg-card">
-                    <SelectItem value="all" className="text-xs cursor-pointer">
-                      All {filter.title}
-                    </SelectItem>
-                    {filter.options.map((opt) => (
-                      <SelectItem
-                        key={opt.value}
-                        value={opt.value}
-                        className="text-xs cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2">
-                          {opt.icon && <opt.icon className="w-3.5 h-3.5" />}
-                          <span>{opt.label}</span>
-                          {typeof opt.count === 'number' && (
-                            <span className="ml-auto text-[10px] text-muted-foreground">
-                              ({opt.count})
-                            </span>
-                          )}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+                    <DropdownMenuSeparator />
+
+                    <div className="max-h-60 overflow-y-auto space-y-0.5 py-1">
+                      {filter.options.map((opt) => {
+                        const isChecked = currentValues.includes(opt.value)
+
+                        return (
+                          <DropdownMenuCheckboxItem
+                            key={opt.value}
+                            checked={isChecked}
+                            onSelect={(e) => {
+                              e.preventDefault()
+                              if (onToggleFilterValue) {
+                                onToggleFilterValue(filter.id, opt.value)
+                              } else {
+                                const next = isChecked
+                                  ? currentValues.filter((v) => v !== opt.value)
+                                  : [...currentValues, opt.value]
+                                onFilterChange(filter.id, next.length > 0 ? next : 'all')
+                              }
+                            }}
+                            className="text-xs cursor-pointer py-1.5 rounded-lg flex items-center justify-between"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              {opt.icon && <opt.icon className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />}
+                              <span className="truncate">{opt.label}</span>
+                            </div>
+                            {typeof opt.count === 'number' && (
+                              <span className="ml-auto text-[10px] text-muted-foreground font-mono">
+                                ({opt.count})
+                              </span>
+                            )}
+                          </DropdownMenuCheckboxItem>
+                        )
+                      })}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )
             })}
 
@@ -178,8 +256,29 @@ export function DataTableToolbar<T>({
             )}
           </div>
 
-          {/* Top Right Controls: Column Visibility, Density Toggle, Fullscreen Toggle */}
+          {/* Top Right Controls: Download Excel (optional), Column Visibility, Density Toggle, Fullscreen Toggle */}
           <div className="flex items-center gap-2 self-end lg:self-center">
+            {/* Optional Download Excel Button */}
+            {(enableExportExcel || Boolean(onExportExcel)) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onExportExcel}
+                    className="h-9 gap-1.5 px-3 rounded-xl border-border bg-card hover:bg-muted/60 text-xs font-medium cursor-pointer shadow-xs text-foreground hover:text-emerald-500 hover:border-emerald-500/40 transition-colors"
+                    aria-label="Download Excel spreadsheet"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="hidden sm:inline">Export Excel</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  Download records as Excel spreadsheet (.xlsx / .csv)
+                </TooltipContent>
+              </Tooltip>
+            )}
+
             {/* 1. Column Visibility Dropdown */}
             <DataTableColumnVisibility
               columns={columns}
@@ -262,32 +361,45 @@ export function DataTableToolbar<T>({
               </Badge>
             )}
 
-            {Object.entries(activeFilters).map(([key, val]) => {
-              if (!val || val === 'all') return null
+            {Object.entries(activeFilters).flatMap(([key, rawVal]) => {
+              if (!rawVal) return []
+              const values = Array.isArray(rawVal) ? rawVal : [rawVal]
               const config = filters.find((f) => f.id === key)
-              const opt = config?.options.find((o) => o.value === val)
-              const displayVal = opt ? opt.label : val
 
-              return (
-                <Badge
-                  key={key}
-                  variant="secondary"
-                  className="gap-1.5 pl-2.5 pr-1 py-0.5 rounded-lg text-xs bg-muted/80 text-foreground border border-border"
-                >
-                  <span className="text-muted-foreground">{config?.title || key}:</span>
-                  <span className="font-semibold text-[#E8B931]">{displayVal}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onFilterChange(key, 'all')}
-                    className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive cursor-pointer hover:bg-transparent"
-                    aria-label={`Remove ${key} filter`}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </Badge>
-              )
+              return values
+                .filter((val) => val && val !== 'all')
+                .map((val) => {
+                  const opt = config?.options.find((o) => o.value === val)
+                  const displayVal = opt ? opt.label : val
+
+                  return (
+                    <Badge
+                      key={`${key}-${val}`}
+                      variant="secondary"
+                      className="gap-1.5 pl-2.5 pr-1 py-0.5 rounded-lg text-xs bg-muted/80 text-foreground border border-border"
+                    >
+                      <span className="text-muted-foreground">{config?.title || key}:</span>
+                      <span className="font-semibold text-[#E8B931]">{displayVal}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (onToggleFilterValue) {
+                            onToggleFilterValue(key, val)
+                          } else {
+                            const remaining = values.filter((v) => v !== val)
+                            onFilterChange(key, remaining.length > 0 ? remaining : 'all')
+                          }
+                        }}
+                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive cursor-pointer hover:bg-transparent"
+                        aria-label={`Remove ${key} ${displayVal} filter`}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </Badge>
+                  )
+                })
             })}
 
             <span className="ml-auto text-[11px] text-muted-foreground">

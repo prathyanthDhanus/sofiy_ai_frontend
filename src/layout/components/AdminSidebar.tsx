@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import {
-  GraduationCap,
+  Briefcase,
   ChevronRight,
   ArrowLeft,
   LogOut,
@@ -48,8 +48,17 @@ export interface AdminSidebarProps {
   modules?: ModuleItem[]
 }
 
+/**
+ * Extracts digits only from a badge string (e.g. "18 Active" -> "18", "3 Alerts" -> "3")
+ */
+function getBadgeNumber(badge?: string): string {
+  if (!badge) return ''
+  const match = badge.match(/\d+/)
+  return match ? match[0] : badge
+}
+
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({
-  activeItem = 'tutor-dashboard',
+  activeItem = 'hr-dashboard',
   onSelectItem,
   onNavigateToAuth,
   modules = defaultModules,
@@ -59,14 +68,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   // Module state
   const [activeModuleId, setActiveModuleId] = useState<string>(
-    modules[0]?.id || 'ai-tutoring'
+    modules[0]?.id || 'ai-recruitment'
   )
   const [showModuleSelector, setShowModuleSelector] = useState<boolean>(false)
 
   // Submenu expansion state (records expanded menu IDs)
   const [expandedMenuIds, setExpandedMenuIds] = useState<string[]>([
-    'live-sessions',
-    'curriculum-mgmt',
+    'candidate-pipeline',
+    'requisitions-mgmt',
   ])
 
   // Active module
@@ -103,7 +112,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <SidebarHeader className="border-b border-border p-3.5 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center w-full">
           <div className="w-8 h-8 rounded-xl bg-[#E8B931] flex items-center justify-center text-white shrink-0 shadow-md shadow-[#E8B931]/20">
-            <GraduationCap className="w-4.5 h-4.5" />
+            <Briefcase className="w-4 h-4" />
           </div>
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <div className="flex items-center gap-1.5">
@@ -111,11 +120,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 Sofiy AI
               </span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#E8B931]/20 border border-[#E8B931]/40 text-[#E8B931]">
-                ADMIN
+                HR
               </span>
             </div>
             <span className="text-[10px] text-muted-foreground truncate">
-              Tutor Console v2.4
+              HR Console v2.4
             </span>
           </div>
         </div>
@@ -142,19 +151,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             </div>
 
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-2.5 py-1">
                 {modules.map((mod) => {
                   const isCurrent = mod.id === activeModuleId
                   return (
-                    <SidebarMenuItem key={mod.id}>
+                    <SidebarMenuItem key={mod.id} className="my-1">
                       <SidebarMenuButton
                         isActive={isCurrent}
                         onClick={() => handleSelectModule(mod.id)}
                         tooltip={mod.title}
-                        className={`h-auto py-2.5 px-2.5 rounded-xl transition-all cursor-pointer ${
+                        className={`h-auto py-2.5 px-3 rounded-xl transition-all cursor-pointer ${
                           isCurrent
                             ? 'bg-[#E8B931] text-zinc-950 font-semibold shadow-xs'
-                            : 'hover:bg-muted'
+                            : 'hover:bg-muted/80'
                         }`}
                       >
                         <DynamicIcon name={mod.icon} className="w-4 h-4 shrink-0" />
@@ -200,7 +209,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           /* VIEW B: Active Module & Its Main Menus + Submenus */
           <>
             {/* Active Module Card with Switcher Pill */}
-            <div className="px-1 group-data-[collapsible=icon]:px-0">
+            <div className="px-1 mb-2.5 group-data-[collapsible=icon]:px-0">
               <div className="flex items-center justify-between p-2 rounded-xl bg-muted/60 border border-border group-data-[collapsible=icon]:p-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:border-0">
                 <div className="flex items-center gap-2 min-w-0 group-data-[collapsible=icon]:justify-center">
                   <div className="w-7 h-7 rounded-lg bg-[#E8B931]/15 border border-[#E8B931]/30 flex items-center justify-center text-[#E8B931] shrink-0">
@@ -236,11 +245,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
             {/* Main Menus & Expandable Submenus */}
             <SidebarGroup className="p-0">
-              <SidebarGroupLabel className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground group-data-[collapsible=icon]:hidden px-2 py-1">
+              <SidebarGroupLabel className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground group-data-[collapsible=icon]:hidden px-2 pt-2 pb-1.5">
                 {currentModule.title} Navigation
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="gap-2 py-1">
                   {currentModule.menus.map((menu) => {
                     const hasSubmenus =
                       Boolean(menu.submenus) && (menu.submenus?.length ?? 0) > 0
@@ -252,16 +261,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     // If menu does NOT have submenus: direct click action
                     if (!hasSubmenus) {
                       return (
-                        <SidebarMenuItem key={menu.id}>
+                        <SidebarMenuItem key={menu.id} className="my-1">
                           <SidebarMenuButton
                             isActive={isMenuDirectActive}
                             onClick={() => onSelectItem?.(menu.id)}
                             tooltip={menu.title}
-                            className={
+                            className={`h-9 px-2.5 rounded-xl transition-all cursor-pointer ${
                               isMenuDirectActive
-                                ? 'bg-[#E8B931] text-zinc-950 font-semibold hover:bg-[#D8A721] hover:text-zinc-950'
-                                : ''
-                            }
+                                ? 'bg-[#E8B931] text-zinc-950 font-semibold hover:bg-[#D8A721] hover:text-zinc-950 shadow-xs'
+                                : 'hover:bg-muted/80'
+                            }`}
                           >
                             <DynamicIcon name={menu.icon} className="w-4 h-4 shrink-0" />
                             <span>{menu.title}</span>
@@ -270,11 +279,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                             <SidebarMenuBadge
                               className={
                                 isMenuDirectActive
-                                  ? 'bg-zinc-950 text-white'
-                                  : 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30'
+                                  ? 'bg-zinc-950 text-white font-bold text-[10px] h-5 min-w-5 px-1.5 rounded-full whitespace-nowrap shrink-0'
+                                  : 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-bold text-[10px] h-5 min-w-5 px-1.5 rounded-full whitespace-nowrap shrink-0'
                               }
                             >
-                              {menu.badge}
+                              {getBadgeNumber(menu.badge)}
                             </SidebarMenuBadge>
                           )}
                         </SidebarMenuItem>
@@ -287,25 +296,28 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         key={menu.id}
                         open={isExpanded}
                         onOpenChange={() => toggleMenuExpanded(menu.id)}
-                        className="group/collapsible"
+                        className="group/collapsible my-1"
                       >
                         <SidebarMenuItem>
                           <CollapsibleTrigger asChild>
                             <SidebarMenuButton
                               isActive={isMenuDirectActive || isSubmenuChildActive}
                               tooltip={menu.title}
-                              className={`cursor-pointer ${
+                              className={`h-9 px-2.5 rounded-xl cursor-pointer transition-all ${
                                 isMenuDirectActive || isSubmenuChildActive
                                   ? 'font-semibold text-foreground bg-muted/80'
-                                  : ''
+                                  : 'hover:bg-muted/60'
                               }`}
                             >
                               <DynamicIcon name={menu.icon} className="w-4 h-4 shrink-0" />
                               <span className="truncate">{menu.title}</span>
                               {menu.badge && (
-                                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 group-data-[collapsible=icon]:hidden">
-                                  {menu.badge}
-                                </span>
+                                <Badge
+                                  variant="outline"
+                                  className="ml-auto text-[10px] font-bold h-5 min-w-5 px-1.5 rounded-full bg-emerald-500/15 text-emerald-500 border-emerald-500/30 whitespace-nowrap shrink-0 group-data-[collapsible=icon]:hidden"
+                                >
+                                  {getBadgeNumber(menu.badge)}
+                                </Badge>
                               )}
                               <ChevronRight className="w-3.5 h-3.5 ml-auto text-muted-foreground transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden shrink-0" />
                             </SidebarMenuButton>
@@ -313,18 +325,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
                           {/* Submenu Expanded Row */}
                           <CollapsibleContent>
-                            <SidebarMenuSub className="mt-1">
+                            <SidebarMenuSub className="mt-2 mb-1.5 space-y-1.5 border-l-2 border-border/80 pl-3 ml-4 py-0.5">
                               {menu.submenus?.map((submenu) => {
                                 const isSubActive = activeItem === submenu.id
                                 return (
-                                  <SidebarMenuSubItem key={submenu.id}>
+                                  <SidebarMenuSubItem key={submenu.id} className="my-1">
                                     <SidebarMenuSubButton
                                       isActive={isSubActive}
                                       onClick={() => onSelectItem?.(submenu.id)}
-                                      className={`cursor-pointer transition-all ${
+                                      className={`h-8 py-1.5 px-2.5 rounded-lg cursor-pointer transition-all ${
                                         isSubActive
-                                          ? 'bg-[#E8B931] text-zinc-950 font-semibold hover:bg-[#D8A721] hover:text-zinc-950'
-                                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                          ? 'bg-[#E8B931] text-zinc-950 font-semibold hover:bg-[#D8A721] hover:text-zinc-950 shadow-xs'
+                                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                                       }`}
                                     >
                                       {submenu.icon && (
@@ -335,15 +347,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                       )}
                                       <span className="truncate">{submenu.title}</span>
                                       {submenu.badge && (
-                                        <span
-                                          className={`ml-auto text-[9px] px-1 py-0.2 rounded-full ${
+                                        <Badge
+                                          variant="outline"
+                                          className={`ml-auto text-[9px] font-bold h-4 min-w-4 px-1 rounded-full whitespace-nowrap shrink-0 ${
                                             isSubActive
-                                              ? 'bg-zinc-950 text-white'
-                                              : 'bg-muted text-muted-foreground'
+                                              ? 'bg-zinc-950 text-white border-zinc-950'
+                                              : 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30'
                                           }`}
                                         >
-                                          {submenu.badge}
-                                        </span>
+                                          {getBadgeNumber(submenu.badge)}
+                                        </Badge>
                                       )}
                                     </SidebarMenuSubButton>
                                   </SidebarMenuSubItem>
@@ -371,17 +384,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div className="relative shrink-0">
                   <Avatar className="w-8 h-8 rounded-full border border-border">
                     <AvatarFallback className="bg-gradient-to-tr from-[#E8B931] to-amber-600 text-white font-bold text-xs">
-                      AD
+                      HR
                     </AvatarFallback>
                   </Avatar>
                   <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-card" />
                 </div>
                 <div className="min-w-0 group-data-[collapsible=icon]:hidden">
                   <p className="text-xs font-semibold text-foreground truncate">
-                    Admin Console
+                    HR Operations
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
-                    admin@sofiy.ai
+                    hr@sofiy.ai
                   </p>
                 </div>
               </div>

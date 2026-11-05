@@ -4,9 +4,9 @@ export const AdminFooter: React.FC = () => {
   return (
     <footer className="h-14 shrink-0 border-t border-border bg-card/60 px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
       <div className="flex items-center gap-2">
-        <span>© {new Date().getFullYear()} Sofiy AI Tutor Engine.</span>
+        <span>© {new Date().getFullYear()} Sofiy AI HR Platform.</span>
         <span className="hidden sm:inline">•</span>
-        <span className="hidden sm:inline text-foreground font-medium">Admin Console v2.4</span>
+        <span className="hidden sm:inline text-foreground font-medium">HR Operations Console v2.4</span>
       </div>
 
       <div className="flex items-center gap-4">

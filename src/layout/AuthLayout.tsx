@@ -1,9 +1,8 @@
 import React from 'react'
 import loginImg from '@/assets/login.jpg'
 import { AuthVectorBackground } from '@/app/pages/auth/components/AuthVectorBackground'
-import { GraduationCap, ShieldCheck, Sparkles } from 'lucide-react'
+import { Briefcase, ShieldCheck, Sparkles } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { ThemeToggle } from '@/components/ThemeToggle'
 
 export interface AuthLayoutProps {
   children?: React.ReactNode
@@ -12,11 +11,11 @@ export interface AuthLayoutProps {
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
     <div className="dark min-h-screen w-full relative flex flex-col justify-between overflow-x-hidden bg-[#07090e] text-foreground select-text">
-      {/* Full-bleed Cinematic Visual Background showing both AI Robot and Human Child */}
+      {/* Full-bleed Cinematic Visual Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
         <img
           src={loginImg}
-          alt="Sofiy AI Tutor Robot and Human Learner"
+          alt="Sofiy AI HR Intelligence Platform"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-90 select-none"
         />
 
@@ -36,22 +35,21 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#E8B931] flex items-center justify-center text-white shadow-lg shadow-[#E8B931]/30">
-            <GraduationCap className="w-6 h-6" />
+            <Briefcase className="w-5 h-5" />
           </div>
           <div className="flex items-center">
             <span className="text-xl font-bold tracking-tight text-white drop-shadow-sm">Sofiy AI</span>
             <span className="text-xs font-semibold ml-2 px-2.5 py-0.5 rounded-full bg-[#E8B931]/20 border border-[#E8B931]/40 text-[#E8B931]">
-              TUTOR
+              HR
             </span>
           </div>
         </div>
 
-        {/* Top-Right Status Badge & Theme Toggle */}
+        {/* Top-Right Status Badge */}
         <div className="flex items-center gap-3">
-          <ThemeToggle size="sm" />
           <Badge variant="outline" className="h-7 px-3 gap-1.5 border-white/15 bg-black/40 text-zinc-200 backdrop-blur-md shadow-xs">
             <span className="w-2 h-2 rounded-full bg-[#E8B931] animate-pulse shadow-[0_0_8px_#E8B931]" />
-            AI Learning Platform
+            AI Human Resources
           </Badge>
         </div>
       </header>
@@ -81,7 +79,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           </div>
         </div>
         <p className="text-[11px] text-zinc-400">
-          © {new Date().getFullYear()} Sofiy AI Tutor. All rights reserved.
+          © {new Date().getFullYear()} Sofiy AI HR. All rights reserved.
         </p>
       </footer>
     </div>
