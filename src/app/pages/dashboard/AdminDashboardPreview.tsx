@@ -19,7 +19,13 @@ import { mockHRCandidates } from '@/layout/data/mockHRCandidates'
 import type { HRCandidate } from '@/layout/data/mockHRCandidates'
 import { toast } from 'sonner'
 
-export const AdminDashboardPreview: React.FC = () => {
+export interface AdminDashboardPreviewProps {
+  onNavigateToCreateJob?: () => void
+}
+
+export const AdminDashboardPreview: React.FC<AdminDashboardPreviewProps> = ({
+  onNavigateToCreateJob,
+}) => {
   const [candidates, setCandidates] = useState<HRCandidate[]>(mockHRCandidates)
 
   // Handlers for Row Actions
@@ -57,6 +63,7 @@ export const AdminDashboardPreview: React.FC = () => {
     {
       id: 'status',
       title: 'Status',
+      icon: CheckCircle2,
       accessorKey: 'status',
       options: [
         { label: 'Interviewing', value: 'Interviewing', icon: Radio },
@@ -69,6 +76,7 @@ export const AdminDashboardPreview: React.FC = () => {
     {
       id: 'department',
       title: 'Department',
+      icon: Building2,
       accessorKey: 'department',
       options: [
         { label: 'Engineering', value: 'Engineering', icon: Building2 },
@@ -271,9 +279,19 @@ export const AdminDashboardPreview: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="h-9 rounded-xl bg-[#E8B931] hover:bg-[#D8A721] text-zinc-950 font-semibold text-xs gap-1.5 cursor-pointer">
-            <Zap className="w-3.5 h-3.5" />
-            <span>Post Requisition</span>
+          <Button
+            onClick={() => {
+              if (onNavigateToCreateJob) {
+                onNavigateToCreateJob()
+              } else {
+                window.history.pushState(null, '', '/jobs/create')
+                window.dispatchEvent(new PopStateEvent('popstate'))
+              }
+            }}
+            className="h-9 rounded-xl bg-[#E8B931] hover:bg-[#D8A721] text-zinc-950 font-semibold text-xs gap-1.5 cursor-pointer shadow-sm hover:shadow"
+          >
+            <Zap className="w-3.5 h-3.5 text-zinc-950" />
+            <span>Create Job Vacancy</span>
           </Button>
         </div>
       </div>

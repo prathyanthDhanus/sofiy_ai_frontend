@@ -21,7 +21,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
   onNavigateToAuth,
 }) => {
   return (
-    <header className="h-16 shrink-0 sticky top-0 z-30 flex items-center justify-between gap-4 px-4 sm:px-6 bg-card/85 backdrop-blur-md border-b border-border">
+    <header className="h-16 shrink-0 sticky top-0 z-40 flex items-center justify-between gap-4 px-4 sm:px-6 bg-card/95 backdrop-blur-md border-b border-border shadow-xs">
       {/* Left: Sidebar Trigger & Breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         <SidebarTrigger className="cursor-pointer hover:bg-muted text-muted-foreground hover:text-foreground" />

@@ -1,8 +1,14 @@
 import React from 'react'
 
-export const AdminFooter: React.FC = () => {
+export interface AdminFooterProps {
+  className?: string
+}
+
+export const AdminFooter: React.FC<AdminFooterProps> = ({ className }) => {
   return (
-    <footer className="h-14 shrink-0 border-t border-border bg-card/60 px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+    <footer
+      className={`h-16 shrink-0 border-t border-border bg-card/60 px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground mt-auto w-full ${className || ''}`}
+    >
       <div className="flex items-center gap-2">
         <span>© {new Date().getFullYear()} Sofiy AI HR Platform.</span>
         <span className="hidden sm:inline">•</span>

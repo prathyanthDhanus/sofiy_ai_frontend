@@ -23,7 +23,12 @@ export const defaultModules: ModuleItem[] = [
         icon: 'Radio',
         badge: '18',
         submenus: [
-          { id: 'active-interviews', title: 'Create a job vacancy', icon: 'Bot' },
+          {
+            id: 'create-job-vacancy',
+            title: 'Create a job vacancy',
+            icon: 'Bot',
+            path: '/jobs/create',
+          },
           { id: 'interview-transcripts', title: 'Interview Transcripts', icon: 'History' },
           { id: 'sentiment-analysis', title: 'Candidate Sentiment & Fit', icon: 'Sparkles' },
         ],

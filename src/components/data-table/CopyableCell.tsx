@@ -62,10 +62,10 @@ export const CopyableCell: React.FC<CopyableCellProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className={`group h-auto inline-flex items-center gap-1.5 px-2 py-0.5 -mx-1.5 rounded-md hover:bg-muted/70 transition-all text-left font-mono text-xs cursor-pointer select-none max-w-full truncate ${className}`}
+            className={`group h-auto inline-flex items-center gap-1.5 px-2 py-0.5 -mx-1.5 rounded-md hover:bg-muted/70 transition-all text-left font-mono text-xs cursor-pointer select-none whitespace-nowrap shrink-0 ${className}`}
           >
             {getPrefixIcon()}
-            <span className="truncate text-foreground group-hover:text-[#E8B931] transition-colors">
+            <span className="whitespace-nowrap font-medium text-foreground group-hover:text-[#E8B931] transition-colors">
               {stringValue}
             </span>
             <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground">

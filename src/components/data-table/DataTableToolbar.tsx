@@ -147,6 +147,8 @@ export function DataTableToolbar<T>({
                 : []
               const hasSelected = currentValues.length > 0
 
+              const FilterIcon = filter.icon || Filter
+
               return (
                 <DropdownMenu key={filter.id}>
                   <DropdownMenuTrigger asChild>
@@ -159,7 +161,7 @@ export function DataTableToolbar<T>({
                       )}
                       aria-label={`Filter by ${filter.title}`}
                     >
-                      <Filter className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <FilterIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                       <span>{filter.title}</span>
                       {hasSelected ? (
                         <Badge
@@ -179,8 +181,9 @@ export function DataTableToolbar<T>({
                     className="w-56 p-2 border-border bg-card shadow-xl space-y-1"
                   >
                     <div className="flex items-center justify-between px-2 py-1">
-                      <DropdownMenuLabel className="p-0 text-xs font-bold text-foreground">
-                        {filter.title}
+                      <DropdownMenuLabel className="p-0 text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <FilterIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span>{filter.title}</span>
                       </DropdownMenuLabel>
                       {hasSelected && (
                         <Button

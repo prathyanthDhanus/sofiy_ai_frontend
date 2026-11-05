@@ -22,8 +22,13 @@ function resolveInitialView(): 'auth' | 'admin' {
   const pathname = window.location.pathname.toLowerCase()
   const token = localStorage.getItem('token')
 
-  // Explicit admin route in URL pathname
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+  // Explicit admin or job create route in URL pathname
+  if (
+    pathname === '/admin' ||
+    pathname.startsWith('/admin/') ||
+    pathname === '/jobs/create' ||
+    pathname.startsWith('/jobs/')
+  ) {
     return 'admin'
   }
 

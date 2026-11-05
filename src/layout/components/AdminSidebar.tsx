@@ -127,7 +127,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   }
 
   // Handle clicking a leaf menu or submenu item
-  const handleItemClick = (itemId: string) => {
+  const handleItemClick = (itemId: string, itemPath?: string) => {
+    if (itemPath) {
+      window.history.pushState(null, '', itemPath)
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    } else if (itemId === 'create-job-vacancy' || itemId === 'active-interviews') {
+      window.history.pushState(null, '', '/jobs/create')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    } else if (itemId === 'hr-dashboard') {
+      window.history.pushState(null, '', '/admin')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }
     onSelectItem?.(itemId)
   }
 
@@ -135,8 +145,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
-      {/* 1. Brand Header */}
-      <SidebarHeader className="border-b border-border p-3.5 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center">
+      {/* 1. Brand Header - Synced to h-16 to match AdminNavbar's bottom border exactly */}
+      <SidebarHeader className="h-16 shrink-0 border-b border-border px-3.5 flex items-center justify-center group-data-[collapsible=icon]:px-0">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center w-full">
           <div className="w-8 h-8 rounded-xl bg-[#E8B931] flex items-center justify-center text-zinc-950 font-bold shrink-0 shadow-md shadow-[#E8B931]/20">
             <Briefcase className="w-4 h-4 text-zinc-950" />
@@ -178,19 +188,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     className="group/module my-1"
                   >
                     <SidebarMenuItem>
-                      {/* Level 1: Module Header Row with Right-side Tooltip for Description */}
+                      {/* Level 1: Module Header Row with Right-side Tooltip */}
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <CollapsibleTrigger asChild>
                             <SidebarMenuButton
-                              className={`h-10 py-2 px-3 rounded-xl transition-all cursor-pointer ${
+                              className={`h-10 py-2 px-3 rounded-xl transition-all cursor-pointer group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center ${
                                 isModuleActive
-                                  ? 'bg-muted/80 text-foreground font-semibold border border-border/80 shadow-xs'
-                                  : 'hover:bg-muted/70 text-foreground/90'
+                                  ? 'bg-muted/80 text-foreground font-semibold border border-border/80 shadow-xs group-data-[collapsible=icon]:border-[#E8B931]/40 group-data-[collapsible=icon]:bg-[#E8B931]/15'
+                                  : 'hover:bg-muted/70 text-foreground/90 group-data-[collapsible=icon]:hover:bg-muted/70'
                               }`}
                             >
-                              <div className="w-6 h-6 rounded-lg bg-[#E8B931]/15 border border-[#E8B931]/30 flex items-center justify-center text-[#E8B931] shrink-0">
-                                <DynamicIcon name={mod.icon} className="w-3.5 h-3.5" />
+                              <div className="w-6 h-6 rounded-lg bg-[#E8B931]/15 border border-[#E8B931]/30 flex items-center justify-center text-[#E8B931] shrink-0 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:h-full group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:border-0">
+                                <DynamicIcon name={mod.icon} className="w-3.5 h-3.5 group-data-[collapsible=icon]:w-4 group-data-[collapsible=icon]:h-4 text-[#E8B931]" />
                               </div>
 
                               <div className="flex items-center justify-between gap-1.5 min-w-0 text-left flex-1 group-data-[collapsible=icon]:hidden">
@@ -212,16 +222,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                           </CollapsibleTrigger>
                         </TooltipTrigger>
 
-                        {mod.description && (
-                          <TooltipContent
-                            side="right"
-                            align="center"
-                            sideOffset={8}
-                            className="max-w-[260px] text-xs font-normal text-left leading-relaxed"
-                          >
-                            <span>{mod.description}</span>
-                          </TooltipContent>
-                        )}
+                        <TooltipContent
+                          side="right"
+                          align="center"
+                          sideOffset={10}
+                          className="max-w-[240px] text-xs text-left leading-relaxed flex flex-col gap-1 p-2.5 rounded-xl border border-border bg-popover text-popover-foreground shadow-lg"
+                        >
+                          <span className="font-bold text-xs text-foreground block">{mod.title}</span>
+                          {mod.description && (
+                            <span className="text-muted-foreground text-[11px] block leading-snug">
+                              {mod.description}
+                            </span>
+                          )}
+                        </TooltipContent>
                       </Tooltip>
 
                       {/* Level 2: Main Menus directly below the selected Module */}
@@ -241,7 +254,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                 <SidebarMenuItem key={menu.id} className="my-1">
                                   <SidebarMenuButton
                                     isActive={isMenuDirectActive}
-                                    onClick={() => handleItemClick(menu.id)}
+                                    onClick={() => handleItemClick(menu.id, menu.path)}
                                     tooltip={menu.title}
                                     className={`h-8.5 px-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                                       isMenuDirectActive
@@ -313,7 +326,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                           <SidebarMenuSubItem key={submenu.id} className="my-0.5">
                                             <SidebarMenuSubButton
                                               isActive={isSubActive}
-                                              onClick={() => handleItemClick(submenu.id)}
+                                              onClick={() => handleItemClick(submenu.id, submenu.path)}
                                               className={`h-7.5 py-1 px-2 rounded-md text-[11px] cursor-pointer transition-all ${
                                                 isSubActive
                                                   ? 'bg-[#E8B931] text-zinc-950 font-semibold hover:bg-[#D8A721] hover:text-zinc-950 shadow-xs'
@@ -361,11 +374,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </SidebarGroup>
       </SidebarContent>
 
-      {/* 3. Sidebar Footer */}
-      <SidebarFooter className="border-t border-border p-3 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="flex items-center justify-between w-full p-2 rounded-xl bg-muted/40 border border-border group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-auto">
+      {/* 3. Sidebar Footer - Synced to h-16 to align seamlessly with AdminFooter */}
+      <SidebarFooter className="h-16 shrink-0 border-t border-border p-0 px-3 flex flex-col justify-center group-data-[collapsible=icon]:px-0">
+        <SidebarMenu className="w-full">
+          <SidebarMenuItem className="w-full">
+            <div className="flex items-center justify-between w-full px-2 py-1.5 rounded-xl bg-muted/40 border border-border group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-auto">
               <div className="flex items-center gap-2.5 min-w-0 group-data-[collapsible=icon]:justify-center">
                 <div className="relative shrink-0">
                   <Avatar className="w-8 h-8 rounded-full border border-border">
@@ -376,10 +389,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-card" />
                 </div>
                 <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-                  <p className="text-xs font-semibold text-foreground truncate">
+                  <p className="text-xs font-semibold text-foreground truncate leading-tight">
                     HR Operations
                   </p>
-                  <p className="text-[10px] text-muted-foreground truncate">
+                  <p className="text-[10px] text-muted-foreground truncate leading-tight">
                     hr@sofiy.ai
                   </p>
                 </div>
@@ -393,10 +406,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       variant="ghost"
                       size="icon"
                       onClick={onNavigateToAuth}
-                      className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-muted rounded-lg transition-colors group-data-[collapsible=icon]:hidden cursor-pointer"
+                      className="h-7 w-7 text-muted-foreground hover:text-rose-400 hover:bg-muted rounded-lg transition-colors group-data-[collapsible=icon]:hidden cursor-pointer shrink-0"
                       aria-label="Sign out & return to login"
                     >
-                      <LogOut className="w-4 h-4" />
+                      <LogOut className="w-3.5 h-3.5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">

@@ -223,6 +223,15 @@ export function useDataTable<T>({
           } else if (filter.accessorKey) {
             rowVal = row[filter.accessorKey]
           }
+
+          if (Array.isArray(rowVal)) {
+            return selectedValues.some((val) =>
+              (rowVal as unknown[]).some(
+                (r) => String(r).toLowerCase().trim() === String(val).toLowerCase().trim()
+              )
+            )
+          }
+
           const normalizedRowVal = String(rowVal ?? '').toLowerCase().trim()
           return selectedValues.some(
             (val) => String(val).toLowerCase().trim() === normalizedRowVal

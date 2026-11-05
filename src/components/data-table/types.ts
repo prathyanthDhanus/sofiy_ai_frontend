@@ -19,8 +19,9 @@ export interface FilterOption {
 export interface FilterConfig<T> {
   id: string
   title: string
+  icon?: React.ComponentType<{ className?: string }>
   accessorKey?: keyof T
-  accessorFn?: (row: T) => string | number | boolean
+  accessorFn?: (row: T) => string | number | boolean | (string | number | boolean)[]
   options: FilterOption[]
 }
 
