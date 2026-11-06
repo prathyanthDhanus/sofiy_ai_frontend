@@ -37,6 +37,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import {
   DUMMY_DEPARTMENTS,
   EMPLOYMENT_TYPES,
@@ -44,6 +45,7 @@ import {
   SUGGESTED_SKILLS,
   EXPERIENCE_RANGE_CONFIG,
   SALARY_RANGE_CONFIG,
+  fetchDepartmentsApi,
   type WorkModeValue,
 } from '../../constant'
 import { useJobCreate, type UseJobCreateOptions } from './useJobCreate'
@@ -250,32 +252,20 @@ export const JobCreateForm: React.FC<JobCreateFormProps> = ({
                   </Label>
                   <span className="text-[10px] text-muted-foreground">Select team unit</span>
                 </div>
-                <Select
+                <SearchableSelect
+                  id="department"
                   value={currentDepartment}
-                  onValueChange={(val) =>
+                  onChange={(val) =>
                     setValue('department', val, { shouldValidate: true, shouldDirty: true })
                   }
-                >
-                  <SelectTrigger
-                    id="department"
-                    className="w-full h-10 text-sm focus-visible:ring-[#E8B931]"
-                    aria-invalid={Boolean(errors.department)}
-                  >
-                    <SelectValue placeholder="Choose Department..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DUMMY_DEPARTMENTS.map((dept) => (
-                      <SelectItem key={dept.id} value={dept.id} className="cursor-pointer py-2">
-                        <div className="flex items-center justify-between w-full gap-3">
-                          <span className="font-medium text-foreground">{dept.label}</span>
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-bold bg-muted/60">
-                            {dept.code}
-                          </Badge>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  fetchOptions={fetchDepartmentsApi}
+                  placeholder="Choose Department..."
+                  searchPlaceholder="Search departments by name or code..."
+                  pageSize={20}
+                  aria-invalid={Boolean(errors.department)}
+                  error={Boolean(errors.department)}
+                  triggerClassName="focus-visible:ring-[#E8B931]"
+                />
                 {errors.department && (
                   <p className="text-xs font-medium text-destructive flex items-center gap-1 mt-1">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -872,10 +862,10 @@ export const JobCreateForm: React.FC<JobCreateFormProps> = ({
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-xs">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={handleResetForm}
           disabled={isSubmitting}
-          className="w-full sm:w-auto text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+          className="w-full sm:w-auto text-xs text-muted-foreground hover:text-foreground cursor-pointer h-10 px-3"
         >
           <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
           Reset Form

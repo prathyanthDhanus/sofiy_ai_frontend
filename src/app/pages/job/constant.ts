@@ -11,28 +11,100 @@ export interface DepartmentOption {
 }
 
 /**
- * 3 dummy departments available initially in the department dropdown.
+ * Dummy departments available initially in the department dropdown (50 items for pagination testing).
  */
 export const DUMMY_DEPARTMENTS: DepartmentOption[] = [
-  {
-    id: "engineering",
-    label: "Software Engineering & Tech",
-    code: "ENG",
-    description: "Frontend, Backend, AI Engineering & Cloud Architecture",
-  },
-  {
-    id: "product-design",
-    label: "Product & UI/UX Design",
-    code: "PRD",
-    description: "Product Strategy, UX Research, Design Systems & Interaction",
-  },
-  {
-    id: "hr-operations",
-    label: "Human Resources & Operations",
-    code: "HRO",
-    description: "People Operations, Talent Acquisition & Organizational Culture",
-  },
+  { id: "engineering", label: "Software Engineering & Tech", code: "ENG", description: "Frontend, Backend, AI Engineering & Cloud Architecture" },
+  { id: "product-design", label: "Product & UI/UX Design", code: "PRD", description: "Product Strategy, UX Research, Design Systems & Interaction" },
+  { id: "hr-operations", label: "Human Resources & Operations", code: "HRO", description: "People Operations, Talent Acquisition & Organizational Culture" },
+  { id: "ai-research", label: "Artificial Intelligence & ML", code: "AIML", description: "Deep Learning, LLM Fine-tuning & Neural Networks" },
+  { id: "data-analytics", label: "Data Science & Business Intelligence", code: "DATA", description: "Data Warehousing, ETL Pipelines & Executive Dashboards" },
+  { id: "cyber-security", label: "Information Security & Compliance", code: "SEC", description: "Threat Hunting, SOC, Penetration Testing & Governance" },
+  { id: "devops-cloud", label: "Cloud Platform & DevOps", code: "OPS", description: "Kubernetes, CI/CD, Terraform & Infrastructure Reliability" },
+  { id: "qa-testing", label: "Quality Assurance & Test Automation", code: "QA", description: "E2E Testing, Cypress, Performance & Regression" },
+  { id: "product-management", label: "Product Management & Growth", code: "PM", description: "Product Roadmaps, OKRs, User Discovery & Analytics" },
+  { id: "finance-accounting", label: "Finance, Billing & Accounting", code: "FIN", description: "Financial Planning, Budgeting, Payroll & Audit" },
+  { id: "marketing-growth", label: "Digital Marketing & Brand", code: "MKT", description: "SEO, Performance Ads, Content Marketing & Social Media" },
+  { id: "sales-enterprise", label: "Enterprise Sales & Business Dev", code: "SALES", description: "Lead Qualification, Pipeline Management & Client Success" },
+  { id: "customer-support", label: "Customer Experience & Support", code: "CS", description: "Helpdesk, Tier 2 Technical Support & Client Onboarding" },
+  { id: "legal-counsel", label: "Legal, Privacy & Compliance", code: "LEGAL", description: "Contracts, GDPR, IP Protection & Regulatory Audits" },
+  { id: "content-strategy", label: "Content Strategy & Copywriting", code: "CONT", description: "Technical Writing, Knowledge Base & Brand Voice" },
+  { id: "mobile-engineering", label: "Mobile Application Development", code: "MOB", description: "iOS Swift, Android Kotlin & React Native" },
+  { id: "blockchain-web3", label: "Blockchain & Decentralized Tech", code: "BC", description: "Smart Contracts, Web3 Architecture & Cryptography" },
+  { id: "embedded-iot", label: "Embedded Systems & Hardware IoT", code: "IOT", description: "Firmware, Sensors, Microcontrollers & Robotics" },
+  { id: "it-infrastructure", label: "Corporate IT & Systems Admin", code: "IT", description: "Workstation Fleet, SSO, Identity & Network Ops" },
+  { id: "talent-acquisition", label: "Talent Sourcing & Recruitment", code: "REC", description: "Technical Sourcing, Candidate Experience & Interviewing" },
+  { id: "solutions-architect", label: "Solutions Architecture", code: "SOL", description: "Pre-sales Tech Architecture & Enterprise Integration" },
+  { id: "procurement-vendor", label: "Procurement & Vendor Management", code: "PROC", description: "SaaS Licensing, Vendor Negotiations & Sourcing" },
+  { id: "operations-logistics", label: "Operations & Facilities Management", code: "OPSM", description: "Workplace Experience, Safety & Equipment" },
+  { id: "public-relations", label: "Corporate Communications & PR", code: "PR", description: "Media Relations, Press Releases & Event Coordination" },
+  { id: "partnerships-alliances", label: "Strategic Partnerships & Alliances", code: "PART", description: "Channel Partners, Ecosystem Integrations & JV" },
+  { id: "developer-relations", label: "Developer Relations & Evangelism", code: "DEVREL", description: "Open Source Community, Hackathons & Tech Talks" },
+  { id: "research-development", label: "Applied Research & Labs", code: "RND", description: "Next-gen Prototypes & Experimental Innovations" },
+  { id: "database-engineering", label: "Database Administration & SQL", code: "DBA", description: "PostgreSQL, Mongo, Sharding & Query Optimization" },
+  { id: "governance-risk", label: "Governance, Risk & Compliance", code: "GRC", description: "SOC2, ISO27001, HIPAA & Internal Risk Audits" },
+  { id: "graphic-design", label: "Visual & Creative Graphic Design", code: "DSGN", description: "Brand Identity, Motion Graphics, Presentations & Video" },
+  { id: "video-media", label: "Multimedia & Video Production", code: "VID", description: "Educational Videos, Post-production, Sound & Animation" },
+  { id: "growth-hacking", label: "Growth Hacking & Experimentation", code: "GRW", description: "A/B Testing, Viral Loops, Conversion Rate Optimization" },
+  { id: "ecommerce-merch", label: "E-Commerce & Digital Merchandising", code: "ECOM", description: "Catalog Management, Checkout Funnels & Inventory" },
+  { id: "executive-leadership", label: "Executive Leadership & Strategy", code: "EXEC", description: "C-Suite Advisory, Board Governance & Long-term Vision" },
 ]
+
+/**
+ * Async API fetch simulator for departments with search and pagination support.
+ */
+export const fetchDepartmentsApi = async ({
+  query,
+  page = 1,
+  pageSize = 20,
+  signal,
+}: {
+  query: string
+  page: number
+  pageSize: number
+  signal?: AbortSignal
+}): Promise<{
+  options: { value: string; label: string; badge: string; subLabel?: string }[]
+  hasMore: boolean
+  total: number
+}> => {
+  // Simulate network latency (300ms) to illustrate the DotLoader in action
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => resolve(), 300)
+    if (signal) {
+      signal.addEventListener('abort', () => {
+        clearTimeout(timer)
+        reject(new DOMException('Aborted', 'AbortError'))
+      })
+    }
+  })
+
+  const q = query.trim().toLowerCase()
+  const filtered = q
+    ? DUMMY_DEPARTMENTS.filter(
+        (d) =>
+          d.label.toLowerCase().includes(q) ||
+          d.code.toLowerCase().includes(q) ||
+          (d.description && d.description.toLowerCase().includes(q))
+      )
+    : DUMMY_DEPARTMENTS
+
+  const start = (page - 1) * pageSize
+  const end = start + pageSize
+  const slice = filtered.slice(start, end).map((d) => ({
+    value: d.id,
+    label: d.label,
+    badge: d.code,
+    subLabel: d.description,
+  }))
+
+  return {
+    options: slice,
+    hasMore: end < filtered.length,
+    total: filtered.length,
+  }
+}
+
 
 /**
  * Employment type options for the dropdown select.
